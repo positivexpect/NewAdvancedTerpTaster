@@ -139,15 +139,10 @@ const BasicReview = () => {
     overall_score: 7,
     notes: '',
     reviewed_by: '',
-    type: 'Hybrid',
-    grower: 'Unknown',
     review_date: new Date().toISOString().split('T')[0]
   });
 
   const [error, setError] = useState(null);
-  const [selectedStrain, setSelectedStrain] = useState('');
-  const [rating, setRating] = useState(0);
-  const [review, setReview] = useState('');
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -176,8 +171,7 @@ const BasicReview = () => {
     else if (e["Strain Name"]) {
       setFormData(prev => ({
         ...prev,
-        strain: e["Strain Name"],
-        type: mapStrainType(e.Type)
+        strain: e["Strain Name"]
       }));
     }
   };
@@ -185,61 +179,23 @@ const BasicReview = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    // Create review object matching the successful format exactly
+    // Create review object matching server's /basic-reviews endpoint requirements
     const reviewData = {
       strain: formData.strain.trim(),
-      type: formData.type,
-      grower: formData.grower.trim(),
       location: formData.location.trim(),
-      review_date: formData.review_date,
-      overall_score: formData.overall_score.toString(),  // Make sure it's a string
-      reviewed_by: formData.reviewed_by.trim(),
-      notes: (formData.notes || '').trim(),
-      // Match the exact format from the successful submission
-      taste_rating: "0.0",
-      smell_rating: "0.0",
-      bag_appeal_rating: "0.0",
-      high_rating: "0.0",
-      looks: "0.0",
-      taste: "0.0",
-      previous_rating: "0.0",
-      terps_percent: "0.0",
-      terpene_percent: "0.0",
-      thc: "0.0",
-      smell: "",
-      bag_appeal: "",
-      break_style: "",
-      known_terps: "",
-      high: "",
-      exhale_terps: "",
-      flower_color: "",
-      grow_style: "",
-      inhale_terps: "",
-      weed_type: formData.type,
-      terpenes: "",
-      second_time_consistency: false,
-      grand_champ: false,
-      chest_punch: false,
-      throat_hitter: false,
-      head_feel: false,
-      body_feel: false
+      overall_score: formData.overall_score.toString(),
+      notes: formData.notes?.trim() || '',
+      reviewed_by: formData.reviewed_by.trim()
     };
 
-    // Add validation for the most critical fields
-    if (!reviewData.strain || !reviewData.reviewed_by || !reviewData.location) {
-      const missing = [];
-      if (!reviewData.strain) missing.push('Strain Name');
-      if (!reviewData.reviewed_by) missing.push('Reviewer Name');
-      if (!reviewData.location) missing.push('Location');
-      
-      setError(`Please fill in required fields: ${missing.join(', ')}`);
+    // Validate required fields exactly as server expects
+    if (!reviewData.strain || !reviewData.location || !reviewData.reviewed_by || !reviewData.overall_score) {
+      setError("Please fill in all required fields: Strain Name, Location, Overall Score, and Reviewer Name");
       return;
     }
 
-    console.log('Review data being sent:', JSON.stringify(reviewData, null, 2));
-
     try {
-      const response = await fetch(`${API_BASE_URL}/reviews`, {
+      const response = await fetch(`${API_BASE_URL}/basic-reviews`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -247,19 +203,10 @@ const BasicReview = () => {
         body: JSON.stringify(reviewData)
       });
 
-      console.log('Raw response:', response);
-      
       const responseData = await response.json();
-      console.log('Response data:', responseData);
 
       if (!response.ok) {
-        console.error('Server error details:', {
-          status: response.status,
-          statusText: response.statusText,
-          responseData
-        });
-        
-        throw new Error(`Submission failed: ${responseData.error || 'Unknown error'}`);
+        throw new Error(responseData.error || 'Failed to submit review');
       }
 
       // Reset form on success
@@ -269,8 +216,6 @@ const BasicReview = () => {
         overall_score: 7,
         notes: '',
         reviewed_by: '',
-        type: 'Hybrid',
-        grower: 'Unknown',
         review_date: new Date().toISOString().split('T')[0]
       });
       setError(null);
@@ -303,24 +248,10 @@ const BasicReview = () => {
             onSelect={(strain) => {
               setFormData(prev => ({
                 ...prev,
-                strain: strain["Strain Name"],
-                type: mapStrainType(strain.Type) // Map the strain type to a valid type
+                strain: strain["Strain Name"]
               }));
             }}
             required
-          />
-
-          <div className="text-sm text-gray-600 mt-2">
-            Current strain value: {formData.strain}
-          </div>
-
-          <SelectInput
-            label="Strain Type"
-            name="type"
-            value={formData.type}
-            onChange={handleChange}
-            required
-            options={STRAIN_TYPES}
           />
 
           <TextInput
@@ -330,15 +261,6 @@ const BasicReview = () => {
             onChange={handleChange}
             required
             placeholder="Where did you get it?"
-          />
-
-          <TextInput
-            label="Grower"
-            name="grower"
-            value={formData.grower}
-            onChange={handleChange}
-            required
-            placeholder="Who grew it?"
           />
 
           <SliderInput
