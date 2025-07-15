@@ -1,25 +1,28 @@
-import React, { useState } from 'react';
-import API_BASE_URL from '../config';
-import StrainSearchInput from './StrainSearchInput';
+import React, { useState } from "react";
+import API_BASE_URL from "../config";
+import StrainSearchInput from "./StrainSearchInput";
+import PhotoUpload from "./PhotoUpload";
 
-console.log('API_BASE_URL:', API_BASE_URL);
+console.log("API_BASE_URL:", API_BASE_URL);
 
 // Reuse the styled components from MasterReview
-const TextInput = React.memo(({ label, name, value, onChange, required, placeholder }) => (
-  <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
-    <label className="block text-lg font-semibold mb-3 text-gray-700">
-      {label}
-    </label>
-    <input
-      name={name}
-      value={value || ''}
-      onChange={onChange}
-      required={required}
-      placeholder={placeholder}
-      className="w-full p-3 rounded-lg border border-gray-200 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all outline-none"
-    />
-  </div>
-));
+const TextInput = React.memo(
+  ({ label, name, value, onChange, required, placeholder }) => (
+    <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+      <label className="block text-lg font-semibold mb-3 text-gray-700">
+        {label}
+      </label>
+      <input
+        name={name}
+        value={value || ""}
+        onChange={onChange}
+        required={required}
+        placeholder={placeholder}
+        className="w-full p-3 rounded-lg border border-gray-200 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all outline-none"
+      />
+    </div>
+  ),
+);
 
 const SliderInput = ({ label, value, name, onChange, onAdjust }) => (
   <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
@@ -34,7 +37,7 @@ const SliderInput = ({ label, value, name, onChange, onAdjust }) => (
       >
         -
       </button>
-      
+
       <div className="flex-1 relative">
         <input
           name={name}
@@ -96,7 +99,7 @@ const SelectInput = ({ label, name, value, onChange, required, options }) => (
       required={required}
       className="w-full p-3 rounded-lg border border-gray-200 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all outline-none"
     >
-      {options.map(option => (
+      {options.map((option) => (
         <option key={option} value={option}>
           {option}
         </option>
@@ -105,124 +108,142 @@ const SelectInput = ({ label, name, value, onChange, required, options }) => (
   </div>
 );
 
-const STRAIN_TYPES = ['Indica', 'Sativa', 'Hybrid', 'Hybrid - Indica Dominant', 'Hybrid - Sativa Dominant'];
+const STRAIN_TYPES = [
+  "Indica",
+  "Sativa",
+  "Hybrid",
+  "Hybrid - Indica Dominant",
+  "Hybrid - Sativa Dominant",
+];
 
 // Update required fields to remove smoking_device
 const requiredFormFields = [
-  'strain',
-  'type',
-  'grower',
-  'location',
-  'review_date',
-  'overall_score',
-  'reviewed_by'
+  "strain",
+  "type",
+  "grower",
+  "location",
+  "review_date",
+  "overall_score",
+  "reviewed_by",
 ];
 
 // Helper function to map strain types
 const mapStrainType = (type) => {
   // Convert to lowercase for comparison
   const lowerType = type?.toLowerCase();
-  
+
   // Map common variations to our valid types
-  if (lowerType?.includes('indica')) return 'Indica';
-  if (lowerType?.includes('sativa')) return 'Sativa';
-  if (lowerType?.includes('hybrid')) return 'Hybrid';
-  
+  if (lowerType?.includes("indica")) return "Indica";
+  if (lowerType?.includes("sativa")) return "Sativa";
+  if (lowerType?.includes("hybrid")) return "Hybrid";
+
   // Default to Hybrid if unknown
-  return 'Hybrid';
+  return "Hybrid";
 };
 
 const BasicReview = () => {
   const [formData, setFormData] = useState({
-    strain: '',
-    location: '',
+    strain: "",
+    location: "",
     overall_score: 7,
-    notes: '',
-    reviewed_by: '',
-    review_date: new Date().toISOString().split('T')[0]
+    notes: "",
+    reviewed_by: "",
+    photos: [],
+    review_date: new Date().toISOString().split("T")[0],
   });
 
   const [error, setError] = useState(null);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
   const adjustSlider = (amount) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      overall_score: Math.min(10, Math.max(0, Number(prev.overall_score) + amount))
+      overall_score: Math.min(
+        10,
+        Math.max(0, Number(prev.overall_score) + amount),
+      ),
     }));
   };
 
   const handleStrainChange = (e) => {
     // If e is an object with a target (regular input)
     if (e.target) {
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
-        strain: e.target.value
+        strain: e.target.value,
       }));
-    } 
+    }
     // If e is a strain object from the suggestion list
     else if (e["Strain Name"]) {
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
-        strain: e["Strain Name"]
+        strain: e["Strain Name"],
       }));
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     // Create review object matching server's /basic-reviews endpoint requirements
     const reviewData = {
       strain: formData.strain.trim(),
       location: formData.location.trim(),
       overall_score: formData.overall_score.toString(),
-      notes: formData.notes?.trim() || '',
-      reviewed_by: formData.reviewed_by.trim()
+      notes: formData.notes?.trim() || "",
+      reviewed_by: formData.reviewed_by.trim(),
+      photos: formData.photos || [],
     };
 
     // Validate required fields exactly as server expects
-    if (!reviewData.strain || !reviewData.location || !reviewData.reviewed_by || !reviewData.overall_score) {
-      setError("Please fill in all required fields: Strain Name, Location, Overall Score, and Reviewer Name");
+    if (
+      !reviewData.strain ||
+      !reviewData.location ||
+      !reviewData.reviewed_by ||
+      !reviewData.overall_score
+    ) {
+      setError(
+        "Please fill in all required fields: Strain Name, Location, Overall Score, and Reviewer Name",
+      );
       return;
     }
 
     try {
       const response = await fetch(`${API_BASE_URL}/basic-reviews`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify(reviewData)
+        body: JSON.stringify(reviewData),
       });
 
       const responseData = await response.json();
 
       if (!response.ok) {
-        throw new Error(responseData.error || 'Failed to submit review');
+        throw new Error(responseData.error || "Failed to submit review");
       }
 
       // Reset form on success
       setFormData({
-        strain: '',
-        location: '',
+        strain: "",
+        location: "",
         overall_score: 7,
-        notes: '',
-        reviewed_by: '',
-        review_date: new Date().toISOString().split('T')[0]
+        notes: "",
+        reviewed_by: "",
+        photos: [],
+        review_date: new Date().toISOString().split("T")[0],
       });
       setError(null);
-      alert('Review submitted successfully!');
-
+      alert("Review submitted successfully!");
     } catch (error) {
-      console.error('Submission error:', error);
+      console.error("Submission error:", error);
       setError(error.message);
     }
   };
@@ -246,9 +267,9 @@ const BasicReview = () => {
             value={formData.strain}
             onChange={handleStrainChange}
             onSelect={(strain) => {
-              setFormData(prev => ({
+              setFormData((prev) => ({
                 ...prev,
-                strain: strain["Strain Name"]
+                strain: strain["Strain Name"],
               }));
             }}
             required
@@ -277,6 +298,13 @@ const BasicReview = () => {
             value={formData.notes}
             onChange={handleChange}
             placeholder="Any thoughts about this strain?"
+          />
+
+          <PhotoUpload
+            onPhotosUploaded={(photos) =>
+              setFormData((prev) => ({ ...prev, photos }))
+            }
+            existingPhotos={formData.photos}
           />
 
           <TextInput
