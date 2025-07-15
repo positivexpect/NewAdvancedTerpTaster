@@ -1052,6 +1052,13 @@ const MasterReview = () => {
             }
           />
 
+          <PhotoUpload
+            onPhotosUploaded={(photos) =>
+              setFormData((prev) => ({ ...prev, photos }))
+            }
+            existingPhotos={formData.photos}
+          />
+
           {submitStatus.show && (
             <div
               className={`p-4 rounded-lg text-center ${
