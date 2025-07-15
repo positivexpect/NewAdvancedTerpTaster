@@ -10,9 +10,32 @@ const { v4: uuidv4 } = require("uuid");
 const path = require("path");
 const fs = require("fs");
 const compression = require("compression");
+const helmet = require("helmet");
 
 const app = express();
-app.use(cors());
+
+// Security middleware
+app.use(
+  helmet({
+    crossOriginResourcePolicy: { policy: "cross-origin" },
+    contentSecurityPolicy: false, // Disable CSP for now to allow image uploads
+  }),
+);
+
+// Performance middleware
+app.use(compression());
+
+// CORS configuration
+app.use(
+  cors({
+    origin:
+      process.env.NODE_ENV === "production"
+        ? ["https://your-domain.com", "https://your-domain.vercel.app"]
+        : ["http://localhost:3000", "http://127.0.0.1:3000"],
+    credentials: true,
+  }),
+);
+
 app.use(express.json({ limit: "10mb" })); // Allows JSON requests with larger payload
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 
