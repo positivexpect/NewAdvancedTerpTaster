@@ -77,7 +77,58 @@ pool
 
 // ✅ Root Route - API Welcome Message
 app.get("/", (req, res) => {
-  res.json({ message: "🔥 Weed Review API is running!" });
+  res.json({
+    message: "🔥 TerpTaster API is running!",
+    version: "2.0.0",
+    features: ["Reviews", "Photo Upload", "Search", "Terpene Analysis"],
+    endpoints: ["/reviews", "/upload", "/search", "/health"],
+  });
+});
+
+// ✅ Health Check Endpoint
+app.get("/health", (req, res) => {
+  res.json({
+    status: "healthy",
+    timestamp: new Date().toISOString(),
+    database: "connected",
+  });
+});
+
+// ✅ Photo Upload Endpoint
+app.post("/upload", upload.array("photos", 5), async (req, res) => {
+  try {
+    if (!req.files || req.files.length === 0) {
+      return res.status(400).json({ error: "No files uploaded" });
+    }
+
+    const processedFiles = [];
+
+    for (const file of req.files) {
+      const fileName = `${uuidv4()}.webp`;
+      const filePath = path.join(uploadsDir, fileName);
+
+      // Process and compress image using Sharp
+      await sharp(file.buffer)
+        .resize(800, 600, { fit: "inside", withoutEnlargement: true })
+        .webp({ quality: 80 })
+        .toFile(filePath);
+
+      processedFiles.push({
+        filename: fileName,
+        originalName: file.originalname,
+        url: `/uploads/${fileName}`,
+        size: file.size,
+      });
+    }
+
+    res.json({
+      message: "Photos uploaded successfully!",
+      files: processedFiles,
+    });
+  } catch (error) {
+    console.error("❌ Photo upload error:", error);
+    res.status(500).json({ error: "Failed to upload photos" });
+  }
 });
 
 // ✅ GET all reviews
