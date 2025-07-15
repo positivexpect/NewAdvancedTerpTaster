@@ -79,10 +79,7 @@ const PhotoUpload = ({ onPhotosUploaded, existingPhotos = [] }) => {
       >
         <input {...getInputProps()} disabled={uploading} />
         {uploading ? (
-          <div className="text-blue-600">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
-            Uploading photos...
-          </div>
+          <LoadingSpinner size="lg" message="Uploading photos..." />
         ) : isDragActive ? (
           <p className="text-blue-600">Drop the photos here...</p>
         ) : (
