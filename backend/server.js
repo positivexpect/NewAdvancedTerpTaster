@@ -85,15 +85,27 @@ const pool = new Pool({
   ssl: { rejectUnauthorized: false },
   max: 20,
   idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 2000,
+  connectionTimeoutMillis: 10000,
+  keepAlive: true,
+  keepAliveInitialDelayMillis: 10000,
+});
+
+// Handle pool errors gracefully
+pool.on("error", (err) => {
+  console.error("❌ Database pool error:", err);
+  // Don't exit the process - let the pool handle reconnection
 });
 
 pool
   .connect()
-  .then(() => console.log("✅ Database connected successfully!"))
+  .then((client) => {
+    console.log("✅ Database connected successfully!");
+    client.release();
+  })
   .catch((err) => {
     console.error("❌ Database connection failed!", err.stack);
-    process.exit(1); // Stop the server if DB fails to connect
+    // Don't exit immediately - allow for retry
+    console.log("🔄 Will retry connection automatically...");
   });
 
 // ✅ Root Route - API Welcome Message
