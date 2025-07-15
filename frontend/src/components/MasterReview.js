@@ -368,6 +368,7 @@ const MasterReview = () => {
     body_feel: false,
     grand_champ: false,
     weedType: "",
+    photos: [],
   });
 
   const [scoreCard, setScoreCard] = useState(initialScoreCard);
