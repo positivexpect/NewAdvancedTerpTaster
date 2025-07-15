@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
 
 import API_BASE_URL from "../config";
-import StrainSearchInput from './StrainSearchInput';
-import terpeneData from '../data/terpenes.json';
+import StrainSearchInput from "./StrainSearchInput";
+import PhotoUpload from "./PhotoUpload";
+import terpeneData from "../data/terpenes.json";
 
 // Move these constants outside
 const WEED_TYPES = [
@@ -44,15 +45,15 @@ const GROW_STYLES = [
 ];
 
 // Get terpenes and flavors from our JSON data
-const TERPENES = terpeneData.terpenes.map(t => t.name).sort();
-const FLAVORS = [...new Set(
-  terpeneData.terpenes.flatMap(t => t.possibleFlavors)
-)].sort();
+const TERPENES = terpeneData.terpenes.map((t) => t.name).sort();
+const FLAVORS = [
+  ...new Set(terpeneData.terpenes.flatMap((t) => t.possibleFlavors)),
+].sort();
 
 // Create flavor to terpenes mapping
 const flavorToTerpenes = {};
-terpeneData.terpenes.forEach(terpene => {
-  terpene.possibleFlavors.forEach(flavor => {
+terpeneData.terpenes.forEach((terpene) => {
+  terpene.possibleFlavors.forEach((flavor) => {
     if (!flavorToTerpenes[flavor]) {
       flavorToTerpenes[flavor] = [];
     }
@@ -125,11 +126,11 @@ const TASTED_FLAVORS = FLAVORS;
 // Define initialScoreCard before using it
 const initialScoreCard = {
   palateScore: 0,
-  palateGrade: '',
+  palateGrade: "",
   terpsIdentified: 0,
   totalPossibleTerps: 0,
   matchedTerps: [],
-  unmatchedTerps: []
+  unmatchedTerps: [],
 };
 
 function calculatePalateScore(formData) {
@@ -202,7 +203,7 @@ const initialFormData = {
   body_feel: false,
 
   // Date field
-  review_date: new Date().toISOString().split('T')[0],
+  review_date: new Date().toISOString().split("T")[0],
 
   // Array fields (initialize as arrays, will convert to text when sending to DB)
   exhale_terps: [],
@@ -214,22 +215,29 @@ const initialFormData = {
   terpenes: [],
 
   // Text fields
-  high: '',
-  smell: '',
-  bag_appeal: '',
-  notes: '',
-  type: '',
-  grower: '',
-  location: '',
-  strain: '',
-  smoking_instrument: '',
-  reviewed_by: '',
-  weed_type: '',
-  smoking_device: ''
+  high: "",
+  smell: "",
+  bag_appeal: "",
+  notes: "",
+  type: "",
+  grower: "",
+  location: "",
+  strain: "",
+  smoking_instrument: "",
+  reviewed_by: "",
+  weed_type: "",
+  smoking_device: "",
 };
 
 const MasterReview = () => {
-  const TextInput = ({ label, name, value, onChange, required, placeholder }) => (
+  const TextInput = ({
+    label,
+    name,
+    value,
+    onChange,
+    required,
+    placeholder,
+  }) => (
     <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
       <label className="block text-lg font-semibold mb-3 text-gray-700">
         {label}
@@ -246,7 +254,15 @@ const MasterReview = () => {
   );
 
   // Move these component definitions inside MasterReview
-  const SliderInput = ({ label, value, name, onChange, onAdjust, max = 10, step = 0.1 }) => (
+  const SliderInput = ({
+    label,
+    value,
+    name,
+    onChange,
+    onAdjust,
+    max = 10,
+    step = 0.1,
+  }) => (
     <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
       <label className="block text-lg font-semibold mb-3 text-gray-700">
         {label}: <span className="text-purple-600 font-bold">{value}</span>
@@ -259,7 +275,7 @@ const MasterReview = () => {
         >
           -
         </button>
-        
+
         <div className="flex-1 relative">
           <input
             name={name}
@@ -315,7 +331,7 @@ const MasterReview = () => {
         className="w-full p-3 rounded-lg border border-gray-200 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all outline-none"
       >
         <option value="">Select {label}</option>
-        {options.map(option => (
+        {options.map((option) => (
           <option key={option} value={option}>
             {option}
           </option>
@@ -326,11 +342,11 @@ const MasterReview = () => {
 
   // State declarations
   const [formData, setFormData] = useState({
-    strain: '',
-    type: '',
-    grower: '',
-    location: '',
-    smoking_device: '',
+    strain: "",
+    type: "",
+    grower: "",
+    location: "",
+    smoking_device: "",
     grow_style: [],
     known_terps: [],
     inhale_terps: [],
@@ -341,21 +357,25 @@ const MasterReview = () => {
     break_style: [],
     overall_score: 7,
     terp_score: 0,
-    terp_grade: '',
-    notes: '',
-    reviewed_by: '',
-    date: new Date().toISOString().split('T')[0],
+    terp_grade: "",
+    notes: "",
+    reviewed_by: "",
+    date: new Date().toISOString().split("T")[0],
     previous_rating: 0,
     throat_hitter: false,
     chest_punch: false,
     head_feel: false,
     body_feel: false,
     grand_champ: false,
-    weedType: ''
+    weedType: "",
   });
 
   const [scoreCard, setScoreCard] = useState(initialScoreCard);
-  const [submitStatus, setSubmitStatus] = useState({ show: false, success: false, message: '' });
+  const [submitStatus, setSubmitStatus] = useState({
+    show: false,
+    success: false,
+    message: "",
+  });
 
   useEffect(() => {
     const now = new Date();
@@ -385,9 +405,9 @@ const MasterReview = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
@@ -427,7 +447,7 @@ const MasterReview = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     // Create review object matching exact database column names
     const reviewData = {
       // Required fields matching DB columns exactly
@@ -435,19 +455,19 @@ const MasterReview = () => {
       type: formData.weedType,
       grower: formData.grower,
       location: formData.location,
-      smoking_instrument: formData.smokingDevice,  // Changed from smoking_device to smoking_instrument
+      smoking_instrument: formData.smokingDevice, // Changed from smoking_device to smoking_instrument
       review_date: formData.date,
       reviewed_by: formData.reviewed_by,
-      
+
       // Optional fields matching DB columns exactly
-      grow_style: formData.grow_style?.join(', '),
-      known_terps: formData.known_terps?.join(', '),
-      inhale_terps: formData.inhale_terps?.join(', '),
-      exhale_terps: formData.exhale_terps?.join(', '),
-      flower_color: formData.flower_color?.join(', '),
-      break_style: formData.break_style?.join(', '),
+      grow_style: formData.grow_style?.join(", "),
+      known_terps: formData.known_terps?.join(", "),
+      inhale_terps: formData.inhale_terps?.join(", "),
+      exhale_terps: formData.exhale_terps?.join(", "),
+      flower_color: formData.flower_color?.join(", "),
+      break_style: formData.break_style?.join(", "),
       overall_score: formData.overall || formData.overall_score || 0,
-      notes: formData.notes || '',
+      notes: formData.notes || "",
       previous_rating: formData.previous_rating || 0,
       throat_hitter: Boolean(formData.throat_hitter),
       chest_punch: Boolean(formData.chest_punch),
@@ -457,88 +477,89 @@ const MasterReview = () => {
       thc: formData.thc || 0,
       terps_percent: formData.terps_percent || 0,
       looks: formData.looks || 0,
-      taste_rating: formData.taste || 0,  // Changed from taste to taste_rating
+      taste_rating: formData.taste || 0, // Changed from taste to taste_rating
       weed_type: formData.weedType,
-      second_time_consistency: false,  // Added missing field from DB
-      high: '',                        // Added missing field from DB
-      high_rating: 0,                  // Added missing field from DB
-      smell: '',                       // Added missing field from DB
-      smell_rating: 0,                 // Added missing field from DB
-      bag_appeal: '',                  // Added missing field from DB
-      bag_appeal_rating: 0,            // Added missing field from DB
-      terpenes: formData.known_terps?.join(', '), // Added missing field from DB
-      terpene_percent: formData.terps_percent || 0 // Added missing field from DB
+      second_time_consistency: false, // Added missing field from DB
+      high: "", // Added missing field from DB
+      high_rating: 0, // Added missing field from DB
+      smell: "", // Added missing field from DB
+      smell_rating: 0, // Added missing field from DB
+      bag_appeal: "", // Added missing field from DB
+      bag_appeal_rating: 0, // Added missing field from DB
+      terpenes: formData.known_terps?.join(", "), // Added missing field from DB
+      terpene_percent: formData.terps_percent || 0, // Added missing field from DB
     };
 
     // Required fields based on exact DB column names
     const requiredFields = [
-      'strain',
-      'type', 
-      'grower',
-      'location',
-      'review_date',
-      'reviewed_by',
-      'smoking_instrument'  // Updated to match DB column name
+      "strain",
+      "type",
+      "grower",
+      "location",
+      "review_date",
+      "reviewed_by",
+      "smoking_instrument", // Updated to match DB column name
     ];
-    
-    const missingFields = requiredFields.filter(field => !reviewData[field]);
+
+    const missingFields = requiredFields.filter((field) => !reviewData[field]);
 
     if (missingFields.length > 0) {
       setSubmitStatus({
         show: true,
         success: false,
-        message: `❌ Missing required fields: ${missingFields.join(', ')}`
+        message: `❌ Missing required fields: ${missingFields.join(", ")}`,
       });
       return;
     }
 
     // Convert arrays to strings for text fields
-    Object.keys(reviewData).forEach(key => {
+    Object.keys(reviewData).forEach((key) => {
       if (Array.isArray(reviewData[key])) {
-        reviewData[key] = reviewData[key].join(', ');
+        reviewData[key] = reviewData[key].join(", ");
       }
     });
 
-    console.log('Submitting review data:', reviewData);
+    console.log("Submitting review data:", reviewData);
 
     try {
       const response = await fetch(`${API_BASE_URL}/reviews`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify(reviewData)
+        body: JSON.stringify(reviewData),
       });
 
       let responseData;
       try {
         responseData = await response.json();
-        console.log('Response data:', responseData);
+        console.log("Response data:", responseData);
       } catch (e) {
-        console.log('Could not parse response as JSON');
+        console.log("Could not parse response as JSON");
       }
 
       if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}. ${responseData?.error || ''}`);
+        throw new Error(
+          `HTTP error! Status: ${response.status}. ${responseData?.error || ""}`,
+        );
       }
 
       setSubmitStatus({
         show: true,
         success: true,
-        message: '✅ Review submitted successfully!'
+        message: "✅ Review submitted successfully!",
       });
-      
+
       setTimeout(() => {
         setFormData(initialFormData);
-        setSubmitStatus({ show: false, success: false, message: '' });
+        setSubmitStatus({ show: false, success: false, message: "" });
       }, 5000);
-      
     } catch (error) {
-      console.error('Full error:', error);
+      console.error("Full error:", error);
       setSubmitStatus({
         show: true,
         success: false,
-        message: `❌ Error submitting review: ${error.message}`
+        message: `❌ Error submitting review: ${error.message}`,
       });
     }
   };
@@ -548,41 +569,44 @@ const MasterReview = () => {
   };
 
   const handleTerpeneToggle = (terpene) => {
-    setFormData(prev => {
-      const currentArray = Array.isArray(prev.known_terps) ? prev.known_terps : [];
+    setFormData((prev) => {
+      const currentArray = Array.isArray(prev.known_terps)
+        ? prev.known_terps
+        : [];
       const newArray = currentArray.includes(terpene)
-        ? currentArray.filter(t => t !== terpene)
+        ? currentArray.filter((t) => t !== terpene)
         : [...currentArray, terpene];
-      
+
       return { ...prev, known_terps: newArray };
     });
   };
 
   const handleFlavorToggle = (flavor, field) => {
-    setFormData(prev => {
-      const dbField = field === 'tastedTerpsInhale' ? 'inhale_terps' : 'exhale_terps';
+    setFormData((prev) => {
+      const dbField =
+        field === "tastedTerpsInhale" ? "inhale_terps" : "exhale_terps";
       const currentArray = Array.isArray(prev[dbField]) ? prev[dbField] : [];
       const newArray = currentArray.includes(flavor)
-        ? currentArray.filter(f => f !== flavor)
+        ? currentArray.filter((f) => f !== flavor)
         : [...currentArray, flavor];
-      
+
       return { ...prev, [dbField]: newArray };
     });
   };
 
   const handleStyleToggle = (style, field) => {
-    setFormData(prev => {
+    setFormData((prev) => {
       const dbFieldMap = {
-        'growStyle': 'grow_style',
-        'flowerColor': 'flower_color',
-        'breakStyle': 'break_style'
+        growStyle: "grow_style",
+        flowerColor: "flower_color",
+        breakStyle: "break_style",
       };
       const dbField = dbFieldMap[field];
       const currentArray = Array.isArray(prev[dbField]) ? prev[dbField] : [];
       const newArray = currentArray.includes(style)
-        ? currentArray.filter(s => s !== style)
+        ? currentArray.filter((s) => s !== style)
         : [...currentArray, style];
-      
+
       return { ...prev, [dbField]: newArray };
     });
   };
@@ -621,7 +645,9 @@ const MasterReview = () => {
           />
 
           <div>
-            <span className="block text-lg font-semibold mb-1">Known Terpenes</span>
+            <span className="block text-lg font-semibold mb-1">
+              Known Terpenes
+            </span>
             <div className="flex flex-wrap gap-2">
               {TERPENES.map((terpene) => (
                 <button
@@ -629,9 +655,10 @@ const MasterReview = () => {
                   type="button"
                   onClick={() => handleTerpeneToggle(terpene)}
                   className={`px-3 py-1 rounded-full text-sm font-semibold transition
-                    ${formData.known_terps.includes(terpene)
-                      ? 'bg-purple-600 text-white'
-                      : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                    ${
+                      formData.known_terps.includes(terpene)
+                        ? "bg-purple-600 text-white"
+                        : "bg-gray-200 text-gray-700 hover:bg-gray-300"
                     }`}
                 >
                   {terpene}
@@ -647,11 +674,12 @@ const MasterReview = () => {
                 <button
                   key={style}
                   type="button"
-                  onClick={() => handleStyleToggle(style, 'growStyle')}
+                  onClick={() => handleStyleToggle(style, "growStyle")}
                   className={`px-3 py-1 rounded-full text-sm font-semibold transition
-                    ${formData.grow_style.includes(style)
-                      ? 'bg-teal-600 text-white'
-                      : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                    ${
+                      formData.grow_style.includes(style)
+                        ? "bg-teal-600 text-white"
+                        : "bg-gray-200 text-gray-700 hover:bg-gray-300"
                     }`}
                 >
                   {style}
@@ -665,7 +693,9 @@ const MasterReview = () => {
             name="terps_percent"
             value={formData.terps_percent}
             onChange={(e) => handleSliderChange(e, "terps_percent", 0.01)}
-            onAdjust={(amount) => adjustSlider("terps_percent", amount, 0, 15, 0.01)}
+            onAdjust={(amount) =>
+              adjustSlider("terps_percent", amount, 0, 15, 0.01)
+            }
             max={15}
             step={0.01}
           />
@@ -706,11 +736,12 @@ const MasterReview = () => {
                 <button
                   key={color}
                   type="button"
-                  onClick={() => handleStyleToggle(color, 'flowerColor')}
+                  onClick={() => handleStyleToggle(color, "flowerColor")}
                   className={`px-3 py-1 rounded-full text-sm font-semibold transition
-                    ${formData.flower_color.includes(color)
-                      ? 'bg-pink-600 text-white'
-                      : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                    ${
+                      formData.flower_color.includes(color)
+                        ? "bg-pink-600 text-white"
+                        : "bg-gray-200 text-gray-700 hover:bg-gray-300"
                     }`}
                 >
                   {color}
@@ -728,11 +759,12 @@ const MasterReview = () => {
                 <button
                   key={style}
                   type="button"
-                  onClick={() => handleStyleToggle(style, 'breakStyle')}
+                  onClick={() => handleStyleToggle(style, "breakStyle")}
                   className={`px-3 py-1 rounded-full text-sm font-semibold transition
-                    ${formData.break_style.includes(style)
-                      ? 'bg-orange-600 text-white'
-                      : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                    ${
+                      formData.break_style.includes(style)
+                        ? "bg-orange-600 text-white"
+                        : "bg-gray-200 text-gray-700 hover:bg-gray-300"
                     }`}
                 >
                   {style}
@@ -782,11 +814,14 @@ const MasterReview = () => {
                 <button
                   key={flavor}
                   type="button"
-                  onClick={() => handleFlavorToggle(flavor, 'tastedTerpsInhale')}
+                  onClick={() =>
+                    handleFlavorToggle(flavor, "tastedTerpsInhale")
+                  }
                   className={`px-3 py-1 rounded-full text-sm font-semibold transition
-                    ${formData.inhale_terps.includes(flavor)
-                      ? 'bg-green-600 text-white'
-                      : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                    ${
+                      formData.inhale_terps.includes(flavor)
+                        ? "bg-green-600 text-white"
+                        : "bg-gray-200 text-gray-700 hover:bg-gray-300"
                     }`}
                 >
                   {flavor}
@@ -804,11 +839,14 @@ const MasterReview = () => {
                 <button
                   key={flavor}
                   type="button"
-                  onClick={() => handleFlavorToggle(flavor, 'tastedTerpsExhale')}
+                  onClick={() =>
+                    handleFlavorToggle(flavor, "tastedTerpsExhale")
+                  }
                   className={`px-3 py-1 rounded-full text-sm font-semibold transition
-                    ${formData.exhale_terps.includes(flavor)
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                    ${
+                      formData.exhale_terps.includes(flavor)
+                        ? "bg-blue-600 text-white"
+                        : "bg-gray-200 text-gray-700 hover:bg-gray-300"
                     }`}
                 >
                   {flavor}
@@ -821,15 +859,21 @@ const MasterReview = () => {
             <h2 className="text-2xl font-bold text-purple-900 mb-4">
               How'd it feel? 🤔
             </h2>
-            
+
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <button
                 type="button"
-                onClick={() => setFormData(prev => ({ ...prev, throat_hitter: !prev.throat_hitter }))}
+                onClick={() =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    throat_hitter: !prev.throat_hitter,
+                  }))
+                }
                 className={`p-4 rounded-lg border-2 transition-all transform hover:scale-105
-                  ${formData.throat_hitter 
-                    ? 'border-red-500 bg-red-100 text-red-700 shadow-lg' 
-                    : 'border-gray-300 hover:border-red-300 hover:bg-red-50'
+                  ${
+                    formData.throat_hitter
+                      ? "border-red-500 bg-red-100 text-red-700 shadow-lg"
+                      : "border-gray-300 hover:border-red-300 hover:bg-red-50"
                   }`}
               >
                 <div className="flex flex-col items-center gap-2">
@@ -840,11 +884,17 @@ const MasterReview = () => {
 
               <button
                 type="button"
-                onClick={() => setFormData(prev => ({ ...prev, chest_punch: !prev.chest_punch }))}
+                onClick={() =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    chest_punch: !prev.chest_punch,
+                  }))
+                }
                 className={`p-4 rounded-lg border-2 transition-all transform hover:scale-105
-                  ${formData.chest_punch 
-                    ? 'border-blue-500 bg-blue-100 text-blue-700 shadow-lg' 
-                    : 'border-gray-300 hover:border-blue-300 hover:bg-blue-50'
+                  ${
+                    formData.chest_punch
+                      ? "border-blue-500 bg-blue-100 text-blue-700 shadow-lg"
+                      : "border-gray-300 hover:border-blue-300 hover:bg-blue-50"
                   }`}
               >
                 <div className="flex flex-col items-center gap-2">
@@ -855,11 +905,17 @@ const MasterReview = () => {
 
               <button
                 type="button"
-                onClick={() => setFormData(prev => ({ ...prev, head_feel: !prev.head_feel }))}
+                onClick={() =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    head_feel: !prev.head_feel,
+                  }))
+                }
                 className={`p-4 rounded-lg border-2 transition-all transform hover:scale-105
-                  ${formData.head_feel 
-                    ? 'border-green-500 bg-green-100 text-green-700 shadow-lg' 
-                    : 'border-gray-300 hover:border-green-300 hover:bg-green-50'
+                  ${
+                    formData.head_feel
+                      ? "border-green-500 bg-green-100 text-green-700 shadow-lg"
+                      : "border-gray-300 hover:border-green-300 hover:bg-green-50"
                   }`}
               >
                 <div className="flex flex-col items-center gap-2">
@@ -870,11 +926,17 @@ const MasterReview = () => {
 
               <button
                 type="button"
-                onClick={() => setFormData(prev => ({ ...prev, body_feel: !prev.body_feel }))}
+                onClick={() =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    body_feel: !prev.body_feel,
+                  }))
+                }
                 className={`p-4 rounded-lg border-2 transition-all transform hover:scale-105
-                  ${formData.body_feel 
-                    ? 'border-purple-500 bg-purple-100 text-purple-700 shadow-lg' 
-                    : 'border-gray-300 hover:border-purple-300 hover:bg-purple-50'
+                  ${
+                    formData.body_feel
+                      ? "border-purple-500 bg-purple-100 text-purple-700 shadow-lg"
+                      : "border-gray-300 hover:border-purple-300 hover:bg-purple-50"
                   }`}
               >
                 <div className="flex flex-col items-center gap-2">
@@ -888,11 +950,17 @@ const MasterReview = () => {
             <div className="mt-6 flex justify-center">
               <button
                 type="button"
-                onClick={() => setFormData(prev => ({ ...prev, grand_champ: !prev.grand_champ }))}
+                onClick={() =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    grand_champ: !prev.grand_champ,
+                  }))
+                }
                 className={`p-4 rounded-lg border-2 transition-all transform hover:scale-105 w-64
-                  ${formData.grand_champ 
-                    ? 'border-yellow-500 bg-yellow-100 text-yellow-700 shadow-lg scale-105' 
-                    : 'border-gray-300 hover:border-yellow-300 hover:bg-yellow-50'
+                  ${
+                    formData.grand_champ
+                      ? "border-yellow-500 bg-yellow-100 text-yellow-700 shadow-lg scale-105"
+                      : "border-gray-300 hover:border-yellow-300 hover:bg-yellow-50"
                   }`}
               >
                 <div className="flex flex-col items-center gap-2">
@@ -907,9 +975,15 @@ const MasterReview = () => {
               </button>
             </div>
 
-            {(formData.throat_hitter || formData.chest_punch || formData.head_feel || formData.body_feel || formData.grand_champ) && (
+            {(formData.throat_hitter ||
+              formData.chest_punch ||
+              formData.head_feel ||
+              formData.body_feel ||
+              formData.grand_champ) && (
               <div className="mt-4 p-3 bg-white rounded-lg border border-purple-200">
-                <p className="text-sm font-medium text-purple-900">Selected Effects:</p>
+                <p className="text-sm font-medium text-purple-900">
+                  Selected Effects:
+                </p>
                 <div className="flex flex-wrap gap-2 mt-2">
                   {formData.throat_hitter && (
                     <span className="px-3 py-1 bg-red-100 text-red-700 rounded-full text-sm font-medium">
@@ -972,14 +1046,17 @@ const MasterReview = () => {
             name="previous_rating"
             value={formData.previous_rating}
             onChange={(e) => handleSliderChange(e, "previous_rating", 0.1)}
-            onAdjust={(amount) => adjustSlider("previous_rating", amount, 0, 10, 0.1)}
+            onAdjust={(amount) =>
+              adjustSlider("previous_rating", amount, 0, 10, 0.1)
+            }
           />
 
           {submitStatus.show && (
-            <div className={`p-4 rounded-lg text-center ${
-              submitStatus.success 
-                ? 'bg-green-100 text-green-700' 
-                : 'bg-red-100 text-red-700'
+            <div
+              className={`p-4 rounded-lg text-center ${
+                submitStatus.success
+                  ? "bg-green-100 text-green-700"
+                  : "bg-red-100 text-red-700"
               }`}
             >
               <p className="text-lg font-semibold">{submitStatus.message}</p>
