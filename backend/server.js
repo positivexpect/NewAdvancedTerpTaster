@@ -118,6 +118,82 @@ app.get("/health", (req, res) => {
   });
 });
 
+// ✅ Analytics and Stats Endpoints
+app.get("/stats", async (req, res) => {
+  try {
+    const [totalReviews, avgScore, topStrains, topReviewers, reviewsByMonth] =
+      await Promise.all([
+        pool.query("SELECT COUNT(*) as total FROM weed_reviews"),
+        pool.query(
+          "SELECT ROUND(AVG(overall_score), 2) as avg_score FROM weed_reviews",
+        ),
+        pool.query(`
+                SELECT strain, COUNT(*) as review_count, ROUND(AVG(overall_score), 2) as avg_score
+                FROM weed_reviews
+                GROUP BY strain
+                ORDER BY review_count DESC, avg_score DESC
+                LIMIT 10
+            `),
+        pool.query(`
+                SELECT reviewed_by, COUNT(*) as review_count
+                FROM weed_reviews
+                GROUP BY reviewed_by
+                ORDER BY review_count DESC
+                LIMIT 10
+            `),
+        pool.query(`
+                SELECT DATE_TRUNC('month', review_date) as month, COUNT(*) as reviews
+                FROM weed_reviews
+                WHERE review_date >= NOW() - INTERVAL '12 months'
+                GROUP BY DATE_TRUNC('month', review_date)
+                ORDER BY month DESC
+            `),
+      ]);
+
+    res.set("Cache-Control", "public, max-age=3600"); // Cache for 1 hour
+    res.json({
+      totalReviews: parseInt(totalReviews.rows[0].total),
+      averageScore: parseFloat(avgScore.rows[0].avg_score) || 0,
+      topStrains: topStrains.rows,
+      topReviewers: topReviewers.rows,
+      reviewsByMonth: reviewsByMonth.rows,
+    });
+  } catch (error) {
+    console.error("❌ Stats error:", error.stack);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get("/terpenes/popular", async (req, res) => {
+  try {
+    const result = await pool.query(`
+            SELECT
+                terpene,
+                COUNT(*) as frequency,
+                ROUND(AVG(overall_score), 2) as avg_score
+            FROM (
+                SELECT unnest(known_terps) as terpene, overall_score
+                FROM weed_reviews
+                WHERE known_terps IS NOT NULL
+                UNION ALL
+                SELECT unnest(terpenes) as terpene, overall_score
+                FROM weed_reviews
+                WHERE terpenes IS NOT NULL
+            ) as terpene_data
+            WHERE terpene IS NOT NULL AND terpene != ''
+            GROUP BY terpene
+            ORDER BY frequency DESC, avg_score DESC
+            LIMIT 20
+        `);
+
+    res.set("Cache-Control", "public, max-age=3600");
+    res.json(result.rows);
+  } catch (error) {
+    console.error("❌ Terpenes stats error:", error.stack);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // ✅ Photo Upload Endpoint
 app.post("/upload", upload.array("photos", 5), async (req, res) => {
   try {
