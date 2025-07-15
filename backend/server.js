@@ -186,25 +186,100 @@ app.get("/reviews/:id", async (req, res) => {
   }
 });
 
-// ✅ Search reviews (by strain, terpenes, etc.)
+// ✅ Enhanced Search reviews (by strain, location, reviewer, terpenes, etc.)
 app.get("/search", async (req, res) => {
   try {
-    const { strain } = req.query;
-    if (!strain) {
-      return res
-        .status(400)
-        .json({ error: "Strain query parameter is required" });
+    const {
+      strain,
+      location,
+      reviewer,
+      terpene,
+      minScore,
+      maxScore,
+      limit = 50,
+    } = req.query;
+
+    if (!strain && !location && !reviewer && !terpene) {
+      return res.status(400).json({
+        error:
+          "At least one search parameter is required (strain, location, reviewer, or terpene)",
+      });
     }
 
-    console.log("🔍 Search query received:", strain);
+    console.log("🔍 Enhanced search query:", {
+      strain,
+      location,
+      reviewer,
+      terpene,
+      minScore,
+      maxScore,
+    });
 
-    const result = await pool.query(
-      "SELECT * FROM weed_reviews WHERE LOWER(strain) LIKE LOWER($1) ORDER BY review_date DESC",
-      [`%${strain}%`],
-    );
+    let whereConditions = [];
+    let queryParams = [];
+    let paramCount = 1;
 
-    console.log("🔎 Search results:", result.rows);
-    res.json(result.rows);
+    // Build dynamic WHERE clause based on provided parameters
+    if (strain) {
+      whereConditions.push(`LOWER(strain) LIKE LOWER($${paramCount})`);
+      queryParams.push(`%${strain}%`);
+      paramCount++;
+    }
+
+    if (location) {
+      whereConditions.push(`LOWER(location) LIKE LOWER($${paramCount})`);
+      queryParams.push(`%${location}%`);
+      paramCount++;
+    }
+
+    if (reviewer) {
+      whereConditions.push(`LOWER(reviewed_by) LIKE LOWER($${paramCount})`);
+      queryParams.push(`%${reviewer}%`);
+      paramCount++;
+    }
+
+    if (terpene) {
+      whereConditions.push(`(
+                LOWER(array_to_string(known_terps, ' ')) LIKE LOWER($${paramCount}) OR
+                LOWER(array_to_string(terpenes, ' ')) LIKE LOWER($${paramCount}) OR
+                LOWER(array_to_string(inhale_terps, ' ')) LIKE LOWER($${paramCount}) OR
+                LOWER(array_to_string(exhale_terps, ' ')) LIKE LOWER($${paramCount})
+            )`);
+      queryParams.push(`%${terpene}%`);
+      paramCount++;
+    }
+
+    if (minScore) {
+      whereConditions.push(`overall_score >= $${paramCount}`);
+      queryParams.push(parseFloat(minScore));
+      paramCount++;
+    }
+
+    if (maxScore) {
+      whereConditions.push(`overall_score <= $${paramCount}`);
+      queryParams.push(parseFloat(maxScore));
+      paramCount++;
+    }
+
+    const query = `
+            SELECT * FROM weed_reviews
+            WHERE ${whereConditions.join(" AND ")}
+            ORDER BY review_date DESC, overall_score DESC
+            LIMIT $${paramCount}
+        `;
+    queryParams.push(parseInt(limit));
+
+    const result = await pool.query(query, queryParams);
+
+    console.log(`🔎 Found ${result.rows.length} results`);
+
+    // Add cache headers for performance
+    res.set("Cache-Control", "public, max-age=300"); // Cache for 5 minutes
+    res.json({
+      results: result.rows,
+      total: result.rows.length,
+      searchParams: { strain, location, reviewer, terpene, minScore, maxScore },
+    });
   } catch (error) {
     console.error("❌ Search error:", error.stack);
     res.status(500).json({ error: error.message });
