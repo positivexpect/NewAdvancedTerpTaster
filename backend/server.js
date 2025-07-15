@@ -300,7 +300,8 @@ app.post("/basic-reviews", async (req, res) => {
   try {
     console.log("📩 Received Basic Review Data:", req.body);
 
-    const { strain, location, overall_score, notes, reviewed_by } = req.body;
+    const { strain, location, overall_score, notes, reviewed_by, photos } =
+      req.body;
 
     // Ensure required fields are present
     if (!strain || !location || !reviewed_by || !overall_score) {
@@ -308,8 +309,8 @@ app.post("/basic-reviews", async (req, res) => {
     }
 
     const insertQuery = `
-            INSERT INTO weed_reviews (strain, location, overall_score, notes, reviewed_by, review_date)
-            VALUES ($1, $2, $3, $4, $5, CURRENT_DATE) RETURNING *;
+            INSERT INTO weed_reviews (strain, location, overall_score, notes, reviewed_by, photos, review_date)
+            VALUES ($1, $2, $3, $4, $5, $6, CURRENT_DATE) RETURNING *;
         `;
 
     const values = [
@@ -318,6 +319,7 @@ app.post("/basic-reviews", async (req, res) => {
       parseFloat(overall_score),
       notes,
       reviewed_by,
+      photos || [],
     ];
 
     const result = await pool.query(insertQuery, values);
