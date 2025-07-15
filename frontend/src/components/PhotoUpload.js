@@ -1,5 +1,6 @@
 import React, { useState, useCallback } from "react";
 import { useDropzone } from "react-dropzone";
+import LoadingSpinner from "./LoadingSpinner";
 
 const PhotoUpload = ({ onPhotosUploaded, existingPhotos = [] }) => {
   const [uploading, setUploading] = useState(false);
