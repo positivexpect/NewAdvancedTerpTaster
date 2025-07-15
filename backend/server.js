@@ -273,6 +273,7 @@ app.post("/reviews", async (req, res) => {
     addField("looks", "looks", req.body.looks);
     addField("taste", "taste", req.body.taste);
     addField("previousRating", "previous_rating", req.body.previousRating);
+    addField("photos", "photos", req.body.photos, "::text[]");
 
     // Build and execute query
     const insertQuery = `
