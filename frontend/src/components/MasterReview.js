@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 
 import API_BASE_URL from "../config";
 import StrainSearchInput from "./StrainSearchInput";
@@ -229,116 +229,116 @@ const initialFormData = {
   smoking_device: "",
 };
 
+const TextInput = ({
+  label,
+  name,
+  value,
+  onChange,
+  required,
+  placeholder,
+}) => (
+  <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+    <label className="block text-lg font-semibold mb-3 text-gray-700">
+      {label}
+    </label>
+    <input
+      name={name}
+      value={value}
+      onChange={onChange}
+      required={required}
+      placeholder={placeholder}
+      className="w-full p-3 rounded-lg border border-gray-200 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all outline-none"
+    />
+  </div>
+);
+
 const MasterReview = () => {
-  const TextInput = ({
-    label,
-    name,
-    value,
-    onChange,
-    required,
-    placeholder,
-  }) => (
-    <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
-      <label className="block text-lg font-semibold mb-3 text-gray-700">
-        {label}
-      </label>
-      <input
-        name={name}
-        value={value}
-        onChange={onChange}
-        required={required}
-        placeholder={placeholder}
-        className="w-full p-3 rounded-lg border border-gray-200 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all outline-none"
-      />
-    </div>
-  );
 
-  // Move these component definitions inside MasterReview
-  const SliderInput = ({
-    label,
-    value,
-    name,
-    onChange,
-    onAdjust,
-    max = 10,
-    step = 0.1,
-  }) => (
-    <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
-      <label className="block text-lg font-semibold mb-3 text-gray-700">
-        {label}: <span className="text-purple-600 font-bold">{value}</span>
-      </label>
-      <div className="flex items-center gap-3">
-        <button
-          type="button"
-          onClick={() => onAdjust(-step)}
-          className="w-8 h-8 flex items-center justify-center bg-purple-100 hover:bg-purple-200 text-purple-700 rounded-full transition-colors"
-        >
-          -
-        </button>
+const SliderInput = ({
+  label,
+  value,
+  name,
+  onChange,
+  onAdjust,
+  max = 10,
+  step = 0.1,
+}) => (
+  <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+    <label className="block text-lg font-semibold mb-3 text-gray-700">
+      {label}: <span className="text-purple-600 font-bold">{value}</span>
+    </label>
+    <div className="flex items-center gap-3">
+      <button
+        type="button"
+        onClick={() => onAdjust(-step)}
+        className="w-8 h-8 flex items-center justify-center bg-purple-100 hover:bg-purple-200 text-purple-700 rounded-full transition-colors"
+      >
+        -
+      </button>
 
-        <div className="flex-1 relative">
-          <input
-            name={name}
-            type="range"
-            min="0"
-            max={max}
-            step={step}
-            value={value}
-            onChange={onChange}
-            className="w-full h-2 bg-purple-100 rounded-lg appearance-none cursor-pointer
-              [&::-webkit-slider-thumb]:appearance-none
-              [&::-webkit-slider-thumb]:w-4
-              [&::-webkit-slider-thumb]:h-4
-              [&::-webkit-slider-thumb]:bg-purple-600
-              [&::-webkit-slider-thumb]:rounded-full
-              [&::-webkit-slider-thumb]:hover:bg-purple-700
-              [&::-webkit-slider-thumb]:transition-colors
-              [&::-webkit-slider-thumb]:cursor-pointer"
-          />
-        </div>
-
-        <button
-          type="button"
-          onClick={() => onAdjust(step)}
-          className="w-8 h-8 flex items-center justify-center bg-purple-100 hover:bg-purple-200 text-purple-700 rounded-full transition-colors"
-        >
-          +
-        </button>
-
+      <div className="flex-1 relative">
         <input
-          type="number"
+          name={name}
+          type="range"
           min="0"
           max={max}
           step={step}
           value={value}
           onChange={onChange}
-          className="w-20 p-2 text-center rounded-lg border border-gray-200 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all outline-none"
+          className="w-full h-2 bg-purple-100 rounded-lg appearance-none cursor-pointer
+            [&::-webkit-slider-thumb]:appearance-none
+            [&::-webkit-slider-thumb]:w-4
+            [&::-webkit-slider-thumb]:h-4
+            [&::-webkit-slider-thumb]:bg-purple-600
+            [&::-webkit-slider-thumb]:rounded-full
+            [&::-webkit-slider-thumb]:hover:bg-purple-700
+            [&::-webkit-slider-thumb]:transition-colors
+            [&::-webkit-slider-thumb]:cursor-pointer"
         />
       </div>
-    </div>
-  );
 
-  const SelectInput = ({ label, name, value, onChange, required, options }) => (
-    <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
-      <label className="block text-lg font-semibold mb-3 text-gray-700">
-        {label}
-      </label>
-      <select
-        name={name}
+      <button
+        type="button"
+        onClick={() => onAdjust(step)}
+        className="w-8 h-8 flex items-center justify-center bg-purple-100 hover:bg-purple-200 text-purple-700 rounded-full transition-colors"
+      >
+        +
+      </button>
+
+      <input
+        type="number"
+        min="0"
+        max={max}
+        step={step}
         value={value}
         onChange={onChange}
-        required={required}
-        className="w-full p-3 rounded-lg border border-gray-200 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all outline-none"
-      >
-        <option value="">Select {label}</option>
-        {options.map((option) => (
-          <option key={option} value={option}>
-            {option}
-          </option>
-        ))}
-      </select>
+        className="w-20 p-2 text-center rounded-lg border border-gray-200 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all outline-none"
+      />
     </div>
-  );
+  </div>
+);
+
+const SelectInput = ({ label, name, value, onChange, required, options }) => (
+  <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+    <label className="block text-lg font-semibold mb-3 text-gray-700">
+      {label}
+    </label>
+    <select
+      name={name}
+      value={value}
+      onChange={onChange}
+      required={required}
+      className="w-full p-3 rounded-lg border border-gray-200 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all outline-none"
+    >
+      <option value="">Select {label}</option>
+      {options.map((option) => (
+        <option key={option} value={option}>
+          {option}
+        </option>
+      ))}
+    </select>
+  </div>
+);
 
   // State declarations
   const [formData, setFormData] = useState({
@@ -347,6 +347,7 @@ const MasterReview = () => {
     grower: "",
     location: "",
     smoking_device: "",
+    smokingDevice: "",
     grow_style: [],
     known_terps: [],
     inhale_terps: [],
@@ -356,6 +357,7 @@ const MasterReview = () => {
     flower_color: [],
     break_style: [],
     overall_score: 7,
+    overall: 7,
     terp_score: 0,
     terp_grade: "",
     notes: "",
@@ -369,6 +371,11 @@ const MasterReview = () => {
     grand_champ: false,
     weedType: "",
     photos: [],
+    thc: 0,
+    terps_percent: 0,
+    looks: 0,
+    smell: 0,
+    taste: 0,
   });
 
   const [scoreCard, setScoreCard] = useState(initialScoreCard);
@@ -390,7 +397,7 @@ const MasterReview = () => {
     const estDateString = `${yyyy}-${mm}-${dd}`;
 
     setFormData((prev) => ({ ...prev, date: estDateString }));
-  }, []);
+  }, []); // Empty dependency array ensures this only runs once
 
   const updateOverallIfNeeded = (newState, changedField) => {
     if (["looks", "smell", "taste"].includes(changedField)) {
@@ -404,13 +411,13 @@ const MasterReview = () => {
     return newState;
   };
 
-  const handleChange = (e) => {
+  const handleChange = useCallback((e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
       [name]: value,
     }));
-  };
+  }, []);
 
   const handleCheckboxGroupChange = (fieldName, optionValue) => {
     setFormData((prev) => {
@@ -702,6 +709,7 @@ const MasterReview = () => {
           />
 
           <TextInput
+            key="grower"
             label="Grower"
             name="grower"
             value={formData.grower}
@@ -711,6 +719,7 @@ const MasterReview = () => {
           />
 
           <TextInput
+            key="location"
             label="Location"
             name="location"
             value={formData.location}
@@ -1017,6 +1026,7 @@ const MasterReview = () => {
           </div>
 
           <TextInput
+            key="notes"
             label="Notes"
             name="notes"
             value={formData.notes}
@@ -1025,6 +1035,7 @@ const MasterReview = () => {
           />
 
           <TextInput
+            key="reviewed_by"
             label="Reviewed By"
             name="reviewed_by"
             value={formData.reviewed_by}
