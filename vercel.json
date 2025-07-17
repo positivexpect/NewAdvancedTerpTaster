@@ -4,7 +4,6 @@
   "outputDirectory": "build",
   "functions": {
     "api/**/*.js": {
-      "runtime": "nodejs@18"
     }
   },
   "routes": [
