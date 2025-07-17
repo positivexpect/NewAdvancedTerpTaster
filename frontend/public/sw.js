@@ -14,7 +14,15 @@ self.addEventListener("install", (event) => {
       .open(CACHE_NAME)
       .then((cache) => {
         console.log("TerpTaster cache opened");
-        return cache.addAll(urlsToCache);
+        // Only cache files that exist, ignore failures
+        return Promise.allSettled(
+          urlsToCache.map(url => 
+            cache.add(url).catch(err => {
+              console.log(`Failed to cache ${url}:`, err);
+              return null;
+            })
+          )
+        );
       })
       .catch((error) => {
         console.log("Cache install failed:", error);

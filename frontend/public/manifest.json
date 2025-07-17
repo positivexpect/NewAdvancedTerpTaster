@@ -21,7 +21,7 @@
       "purpose": "any maskable"
     },
     {
-      "src": "apple-touch-icon.png",
+      "src": "logo512.png",
       "type": "image/png",
       "sizes": "180x180"
     }
@@ -31,21 +31,5 @@
   "orientation": "portrait-primary",
   "theme_color": "#8b5cf6",
   "background_color": "#1e1b4b",
-  "categories": ["lifestyle", "utilities"],
-  "screenshots": [
-    {
-      "src": "screenshot-wide.png",
-      "sizes": "1280x720",
-      "type": "image/png",
-      "form_factor": "wide",
-      "label": "TerpTaster Home Screen"
-    },
-    {
-      "src": "screenshot-narrow.png",
-      "sizes": "750x1334",
-      "type": "image/png",
-      "form_factor": "narrow",
-      "label": "TerpTaster Mobile View"
-    }
-  ]
+  "categories": ["lifestyle", "utilities"]
 }
