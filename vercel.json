@@ -10,6 +10,12 @@
       "dest": "/api/$1"
     },
     {
+      "src": "/sw.js",
+      "headers": {
+        "content-type": "application/javascript"
+      }
+    },
+    {
       "src": "/static/(.*)",
       "headers": {
         "cache-control": "s-maxage=31536000,immutable"
