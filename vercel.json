@@ -13,6 +13,34 @@
   },
   "routes": [
     {
+      "src": "/api/basic-reviews",
+      "dest": "/api/basic-reviews.js"
+    },
+    {
+      "src": "/api/reviews",
+      "dest": "/api/reviews.js"
+    },
+    {
+      "src": "/api/search",
+      "dest": "/api/search.js"
+    },
+    {
+      "src": "/api/stats",
+      "dest": "/api/stats.js"
+    },
+    {
+      "src": "/api/upload",
+      "dest": "/api/upload.js"
+    },
+    {
+      "src": "/api/health",
+      "dest": "/api/health.js"
+    },
+    {
+      "src": "/api/terpenes/popular",
+      "dest": "/api/terpenes/popular.js"
+    },
+    {
       "src": "/api/(.*)",
       "dest": "/api/$1"
     },
