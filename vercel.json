@@ -4,11 +4,71 @@
   "outputDirectory": "build",
   "framework": "create-react-app",
   "functions": {
-    "api/**/*.js": {
+    "api/test.js": {
+      "runtime": "nodejs18.x"
+    },
+    "api/basic-reviews.js": {
+      "runtime": "nodejs18.x"
+    },
+    "api/basic-reviews-simple.js": {
+      "runtime": "nodejs18.x"
+    },
+    "api/reviews.js": {
+      "runtime": "nodejs18.x"
+    },
+    "api/search.js": {
+      "runtime": "nodejs18.x"
+    },
+    "api/stats.js": {
+      "runtime": "nodejs18.x"
+    },
+    "api/upload.js": {
+      "runtime": "nodejs18.x"
+    },
+    "api/health.js": {
+      "runtime": "nodejs18.x"
+    },
+    "api/terpenes/popular.js": {
       "runtime": "nodejs18.x"
     }
   },
   "routes": [
+    {
+      "src": "/api/test",
+      "dest": "/api/test.js"
+    },
+    {
+      "src": "/api/basic-reviews",
+      "dest": "/api/basic-reviews.js"
+    },
+    {
+      "src": "/api/basic-reviews-simple",
+      "dest": "/api/basic-reviews-simple.js"
+    },
+    {
+      "src": "/api/reviews",
+      "dest": "/api/reviews.js"
+    },
+    {
+      "src": "/api/search",
+      "dest": "/api/search.js"
+    },
+    {
+      "src": "/api/stats",
+      "dest": "/api/stats.js"
+    },
+    {
+      "src": "/api/upload",
+      "dest": "/api/upload.js"
+    },
+    {
+      "src": "/api/health",
+      "dest": "/api/health.js"
+    },
+    {
+      "src": "/api/terpenes/popular",
+      "dest": "/api/terpenes/popular.js"
+    },
     {
       "src": "/api/(.*)",
       "dest": "/api/$1"
