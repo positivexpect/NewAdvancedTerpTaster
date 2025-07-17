@@ -13,5 +13,11 @@
     "reviews"
   ],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "pg": "^8.11.0",
+    "uuid": "^11.1.0",
+    "@vercel/blob": "^1.1.1",
+    "formidable": "^3.5.1"
+  }
 }
