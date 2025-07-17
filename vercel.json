@@ -21,6 +21,7 @@
     }
   ],
   "env": {
-    "DATABASE_URL": "postgresql://neondb_owner:npg_kzUc4b1eqiGs@ep-blue-sun-adpe3k3q-pooler.c-2.us-east-1.aws.neon.tech/neondb?sslmode=require"
+    "DATABASE_URL": "postgresql://neondb_owner:npg_kzUc4b1eqiGs@ep-blue-sun-adpe3k3q-pooler.c-2.us-east-1.aws.neon.tech/neondb?sslmode=require",
+    "CI": "false"
   }
 }
