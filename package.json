@@ -1,0 +1,23 @@
+{
+  "name": "terptaster",
+  "version": "1.0.0",
+  "description": "TerpTaster - Cannabis strain review app",
+  "scripts": {
+    "build": "cd frontend && npm run build",
+    "start": "cd frontend && npm start",
+    "install-deps": "cd frontend && npm install && cd ../backend && npm install"
+  },
+  "keywords": [
+    "cannabis",
+    "strains",
+    "reviews"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "pg": "^8.11.0",
+    "uuid": "^11.1.0",
+    "@vercel/blob": "^1.1.1",
+    "formidable": "^3.5.1"
+  }
+}
