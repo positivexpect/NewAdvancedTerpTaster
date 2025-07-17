@@ -24,6 +24,14 @@
       "dest": "/index.html"
     }
   ],
+  "functions": {
+    "api/**/*.js": {
+      "runtime": "nodejs18.x"
+    },
+    "backend/server.js": {
+      "runtime": "nodejs18.x"
+    }
+  },
   "env": {
     "DATABASE_URL": "postgresql://neondb_owner:npg_kzUc4b1eqiGs@ep-blue-sun-adpe3k3q-pooler.c-2.us-east-1.aws.neon.tech/neondb?sslmode=require"
   }
